@@ -6,7 +6,7 @@
 Adafruit_MPU6050 mpu;
 
 //Microphone
-int micPin = A3;
+int micPin = A0;
 
 //Sampling rate
 #define PERIOD 1
