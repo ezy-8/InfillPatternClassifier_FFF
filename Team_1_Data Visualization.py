@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 date = 20250426
-run = 'Rectilinear'
+run = 'fiveMin'
 trial = '0'
 
 dataFrame = pd.read_csv('Team_1\\Data' + f'/{date}_{run}_{trial}.csv')

@@ -35,10 +35,11 @@ void setup() {
 }
 
 void loop() {
-  if (millis() - time > PERIOD) {
-    time += PERIOD;
-    sample();
-  }
+  sample();
+  //if (millis() - time > PERIOD) {
+    //time += PERIOD;
+    //sample();
+  //}
 }
 
 void sample() {

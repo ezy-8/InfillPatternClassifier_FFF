@@ -7,7 +7,7 @@ import time
 #create folder to store data
 #folder = 'test'
 date = 20250426
-pattern = 'Rectilinear'
+pattern = 'fiveMin'
 trial = '0'
 
 '''# make another folder to store data if this one already exists
