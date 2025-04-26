@@ -1,27 +1,28 @@
 #%% import libraries
 import csv
 import serial
-import os
+#import os
 import time
 
 #create folder to store data
-folder = 'test'
+#folder = 'test'
 date = 20250423
-version = '1'
+pattern = 'Test'
+trial = '1'
 
-# make another folder to store data if this one already exists
+'''# make another folder to store data if this one already exists
 count = 1
 while os.path.exists(folder):
     folder = folder[:-1] + str(count)
     count += 1
-os.mkdir(folder)
+os.mkdir(folder)'''
 
 # Depends on system
 comPort = 'COM3'
 baudRate = 9600
 
 # initialize csv file
-file = open(folder + f'/{date}_{version}.csv', 'w', newline='')
+file = open(f'{date}_{pattern}_{trial}.csv', 'w', newline='')
 #file.truncate()
 
 # seconds of data collection and flush
