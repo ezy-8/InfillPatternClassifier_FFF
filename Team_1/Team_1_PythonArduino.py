@@ -6,9 +6,9 @@ import time
 
 #create folder to store data
 #folder = 'test'
-date = 20250423
-pattern = 'Test'
-trial = '1'
+date = 20250426
+pattern = 'Rectilinear'
+trial = '0'
 
 '''# make another folder to store data if this one already exists
 count = 1
@@ -22,7 +22,7 @@ comPort = 'COM3'
 baudRate = 9600
 
 # initialize csv file
-file = open('2 Data' + f'/{date}_{pattern}_{trial}.csv', 'w', newline='')
+file = open('Data' + f'/{date}_{pattern}_{trial}.csv', 'w', newline='')
 #file.truncate()
 
 # seconds of data collection and flush

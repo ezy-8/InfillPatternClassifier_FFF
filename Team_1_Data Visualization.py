@@ -2,11 +2,11 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-date = 20250423
-run = 'Test'
-trial = '1'
+date = 20250426
+run = 'Rectilinear'
+trial = '0'
 
-dataFrame = pd.read_csv('2 Data' + f'/{date}_{run}_{trial}.csv')
+dataFrame = pd.read_csv('Team_1\\Data' + f'/{date}_{run}_{trial}.csv')
 print(dataFrame.shape)
 
 #%% 2. define channels [METHOD - DROP USELESS ROWS]
