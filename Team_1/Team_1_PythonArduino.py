@@ -22,7 +22,7 @@ comPort = 'COM3'
 baudRate = 9600
 
 # initialize csv file
-file = open(f'{date}_{pattern}_{trial}.csv', 'w', newline='')
+file = open('2 Data' + f'/{date}_{pattern}_{trial}.csv', 'w', newline='')
 #file.truncate()
 
 # seconds of data collection and flush
