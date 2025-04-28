@@ -39,7 +39,7 @@ void loop() {
   mpu.getEvent(&a, &g, &temp);
 
   //Obtain microphone data
-  float val = analogRead(micPin) * (5.0 / 1023.0) ;
+  float val = analogRead(micPin) * (5.0 / 1023.0);
 
   //Print all
   Serial.print(millis());
