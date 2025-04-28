@@ -5,32 +5,16 @@ import serial
 #create folder to store data
 #folder = 'test'
 date = 20250428
-pattern = 'interruptbutton'
-trial = '1'
-
-'''# make another folder to store data if this one already exists
-count = 1
-while os.path.exists(folder):
-    folder = folder[:-1] + str(count)
-    count += 1
-os.mkdir(folder)'''
-
-# Depends on system
-comPort = 'COM3'
-baudRate = 9600
+pattern = 'hilbert'
+trial = '0'
 
 # open the serial port in Arduino
-arduinoPort = serial.Serial(comPort, baudRate)
+arduinoPort = serial.Serial('COM3', 9600) # depends on the system
 arduinoPort.flushInput() #discards all buffers
-arduinoPort.flushOutput()
 
 # initialize csv file
 file = open(f'{date}_{pattern}_{trial}.csv', 'w', newline='')
 #file.truncate() no reason for this
-
-# seconds of data collection and flush
-#t = float(input('How long do you want to collect the data for (in seconds)? '))  
-#timeout = t * 1000 #time.time()
 
 # gather data
 while True:
