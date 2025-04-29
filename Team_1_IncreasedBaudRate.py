@@ -1,6 +1,6 @@
 #%% import libraries (done with help from perplexity.ai)
 date = 20250428
-pattern = 'alleviatedBuffer'
+pattern = 'maxBaudRate'
 trial = '0'
 
 import serial
@@ -8,7 +8,7 @@ import csv
 
 with open(f'{date}_{pattern}_{trial}.csv', 'w', newline='') as csvfile:
     try:
-        ser = serial.Serial('COM4', 9600, timeout=1)
+        ser = serial.Serial('COM4', 500000, timeout=1)
         writer = csv.writer(csvfile)
         while True:
             line = ser.readline().decode('utf-8').strip()

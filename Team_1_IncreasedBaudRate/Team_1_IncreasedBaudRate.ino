@@ -12,8 +12,9 @@ int micPin = A2;
 int micPin2 = A3;
 
 void setup() {
+
   //Set baud rate same as python code
-  Serial.begin(9600);
+  Serial.begin(500000);
 
   //Initialize accelerometer
   mpu.begin();
@@ -40,22 +41,23 @@ void loop() {
   float val2 = analogRead(micPin2) * (5.0 / 1023.0);
 
   //Print all
-  //Serial.print(millis() / 1000.0);
-  //Serial.print(",");
   Serial.print(a.acceleration.x);
   Serial.print(",");
   Serial.print(a.acceleration.y);
   Serial.print(",");
   Serial.print(a.acceleration.z);
   Serial.print(",");
+  delay(500);
   Serial.print(a2.acceleration.x);
   Serial.print(",");
   Serial.print(a2.acceleration.y);
   Serial.print(",");
   Serial.print(a2.acceleration.z);
   Serial.print(",");
+  delay(500);
   Serial.print(val);
   Serial.print(",");
+  delay(250);
   Serial.println(val2);
-  delay(1000);
+  delay(250);
 }
