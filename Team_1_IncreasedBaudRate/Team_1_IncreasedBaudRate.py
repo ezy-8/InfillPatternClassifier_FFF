@@ -1,12 +1,13 @@
 #%% import libraries (done with help from perplexity.ai)
 date = 20250428
-pattern = 'maxBaudRate'
-trial = '1Hz'
+pattern = 'concentric'
+sampling = '0.5Hz'
+trial = 1
 
 import serial
 import csv
 
-with open(f'{date}_{pattern}_{trial}.csv', 'w', newline='') as csvfile:
+with open(f'{date}_{pattern}_{sampling}_{trial}.csv', 'w', newline='') as csvfile:
     try:
         ser = serial.Serial('COM4', 2000000, timeout=1)
         writer = csv.writer(csvfile)
@@ -19,3 +20,5 @@ with open(f'{date}_{pattern}_{trial}.csv', 'w', newline='') as csvfile:
         print(f'Error: {e}')
     finally:
         ser.close()
+
+# %%
