@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 date = 20250429
-run = 'concentric'
+run = 'triangle'
 sampling = '1Hz'
 trial = '1'
 
@@ -60,21 +60,17 @@ if len(totalSamples) % steps != 0:
     # Truncate the data to make it divisible by the window size
     removal = len(totalSamples) % steps
     # Remove the last few samples
-    totalSamples = totalSamples[:-removal]
+    totalSamplesNew = totalSamples[:-removal]
     print(f'Removed {removal} samples to make the data length divisible by {steps}.')
     # Reshape into 3d array
-    totalSamples = totalSamples.reshape(-1, steps, 8)
-    print(totalSamples.shape)
+    totalSamplesNew = totalSamplesNew.reshape(-1, steps, 8)
+    print(totalSamplesNew.shape)
 else:
     print('Data length is divisible by window size.')
-    print(totalSamples.shape)
-    
-    
-#%% Truncate to 620 samples (620 ÷ 10 = 62 windows)
-truncated = data[:620]  # Remove last 3 rows
+    totalSamplesNew = totalSamples.reshape(-1, steps, 8)
+    print(totalSamplesNew.shape)
 
-# Reshape into 62 non-overlapping windows of 10 steps
-windows = truncated.reshape(62, 10, 8)
-
+# %% save preprocessed data
+np.save(f'{date}_{run}_{sampling}_{trial}_PreprocessedWith{steps}Windows.npy', totalSamplesNew)
 
 # %%
