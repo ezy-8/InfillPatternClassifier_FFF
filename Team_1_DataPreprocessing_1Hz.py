@@ -53,7 +53,7 @@ plt.legend()
 plt.title('Window of 100 samples')
 
 # %% FIXED (unadaptive) windows, adjust later and do not make adaptive
-steps = 10
+steps = 5
 
 if len(totalSamples) % steps != 0:
     print('Data length is not divisible by window size.')
@@ -71,6 +71,6 @@ else:
     print(totalSamplesNew.shape)
 
 # %% save preprocessed data
-np.save(f'{date}_{run}_{sampling}_{trial}_PreprocessedWith{steps}Windows.npy', totalSamplesNew)
+np.save('4 Machine Learning' + f'/{date}_{run}_{sampling}_{trial}_PreprocessedWith{steps}Windows.npy', totalSamplesNew)
 
 # %%
