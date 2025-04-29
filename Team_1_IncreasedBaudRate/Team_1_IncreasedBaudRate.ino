@@ -52,5 +52,5 @@ void loop() {
   Serial.print(",");
   delay(125);
   Serial.println(val2);
-  delay(125);
+  delay(125); //Total = 1 Hz
 }
