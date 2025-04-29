@@ -19,5 +19,3 @@ with open(f'{date}_{pattern}_{trial}.csv', 'w', newline='') as csvfile:
         print(f'Error: {e}')
     finally:
         ser.close()
-        
-# %%
