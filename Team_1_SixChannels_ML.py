@@ -1,22 +1,20 @@
 # %% Load libraries
 import numpy as np
-import tensorflow as tf
-from tensorflow.keras import layers
 print('Libraries loaded')
 
 #%% Load dataset
-date = 20250429
-sampling = '1Hz'
-trial = '1'
-steps = 5
+date = 20250430
+sampling = '1Hz6Ch'
+run = '1'
+steps = 10
 
-runs = ['concentric', 'hilbert', 'honeycomb', 'rectilinear', 'triangle']
+pattern = ['concentric', 'hilbert', 'honeycomb', 'rectilinear', 'triangle']
 
-X0 = np.load('4 Machine Learning' + f'/{date}_{runs[0]}_{sampling}_{trial}_PreprocessedWith{steps}Windows.npy')
-X1 = np.load('4 Machine Learning' + f'/{date}_{runs[1]}_{sampling}_{trial}_PreprocessedWith{steps}Windows.npy')
-X2 = np.load('4 Machine Learning' + f'/{date}_{runs[2]}_{sampling}_{trial}_PreprocessedWith{steps}Windows.npy')
-X3 = np.load('4 Machine Learning' + f'/{date}_{runs[3]}_{sampling}_{trial}_PreprocessedWith{steps}Windows.npy')
-X4 = np.load('4 Machine Learning' + f'/{date}_{runs[4]}_{sampling}_{trial}_PreprocessedWith{steps}Windows.npy')
+X0 = np.load('4 Machine Learning' + f'/{date}_{pattern[0]}_{sampling}_{run}_PreprocessedWith{steps}Windows.npy')
+X1 = np.load('4 Machine Learning' + f'/{date}_{pattern[1]}_{sampling}_{run}_PreprocessedWith{steps}Windows.npy')
+X2 = np.load('4 Machine Learning' + f'/{date}_{pattern[2]}_{sampling}_{run}_PreprocessedWith{steps}Windows.npy')
+X3 = np.load('4 Machine Learning' + f'/{date}_{pattern[3]}_{sampling}_{run}_PreprocessedWith{steps}Windows.npy')
+X4 = np.load('4 Machine Learning' + f'/{date}_{pattern[4]}_{sampling}_{run}_PreprocessedWith{steps}Windows.npy')
 
 print(X0.shape, X1.shape, X2.shape, X3.shape, X4.shape)
 
@@ -59,30 +57,23 @@ print(X_train.shape, y_train.shape)
 print('Testing:')
 print(X_test.shape, y_test.shape)
 
-#%% Decision Tree Classifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import classification_report, confusion_matrix
+#%% Normalize the training data
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
 
-clf = DecisionTreeClassifier(random_state=42, max_depth=20)  # You can adjust max_depth as needed
-clf.fit(X_train.reshape(len(X_train), -1), y_train)  # Reshape to 2D for sklearn
+print('Normalized training data:')
+print(X_train.shape, X_test.shape)
 
-#%% Evaluate the model
-y_pred = clf.predict(X_test.reshape(len(X_test), -1))  # Reshape to 2D for sklearn
-print('Accuracy:', clf.score(X_test.reshape(len(X_test), -1), y_test) * 100)
-print('Classification Report:\n', classification_report(y_test, y_pred))
+#%% Apply PCA
+from sklearn.decomposition import PCA
+pca = PCA(n_components=5, random_state=42)  # Keep 95% of variance
+X_train = pca.fit_transform(X_train)
+X_test = pca.transform(X_test)
 
-#%% Confusion Matrix
-from sklearn.metrics import ConfusionMatrixDisplay
-import matplotlib.pyplot as plt
-
-matrix = confusion_matrix(y_test, y_pred)
-disp = ConfusionMatrixDisplay(confusion_matrix=matrix, display_labels=runs)
-
-# Plot with values and colorbar
-disp.plot(cmap='Blues', values_format='d')  # 'd' = integer formatting
-plt.title('Confusion Matrix')
-plt.tight_layout()
-plt.show()
+print('PCA applied:')
+print(X_train.shape, X_test.shape)
 
 # %% Compare Algorithms
 # Load libraries
@@ -121,4 +112,32 @@ for name, model in models:
     names.append(name)
     print(f"{name}: {cv_results.mean():.3f} (±{cv_results.std():.3f})")
 
-# %%
+#%% Best model
+choice = 5
+
+clf = models[choice][1] # first index indicates the model to use
+clf.fit(X_train, y_train)
+print(f'Best model: {models[choice][0]}')
+
+#%% Evaluate the model
+from sklearn.metrics import classification_report, confusion_matrix
+y_pred = clf.predict(X_test)  # Reshape to 2D for sklearn
+print(f'Accuracy: {round(clf.score(X_test, y_test) * 100, 2)}%')
+print('')
+print('Classification Report:\n', classification_report(y_test, y_pred))
+
+#%% Confusion Matrix
+from sklearn.metrics import ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
+
+matrix = confusion_matrix(y_test, y_pred)
+disp = ConfusionMatrixDisplay(confusion_matrix=matrix, display_labels=pattern)
+
+# Plot with values and colorbar
+disp.plot(cmap='Blues', values_format='d')  # 'd' = integer formatting
+print('Confusion Matrix:')
+plt.title('Confusion Matrix')
+plt.tight_layout()
+plt.show()
+
+# 04/30/2025 - Highest test accuracy: 63.16% with SVC (linear kernel) and PCA
