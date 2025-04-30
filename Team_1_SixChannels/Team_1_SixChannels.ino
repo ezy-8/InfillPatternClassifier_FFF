@@ -33,20 +33,20 @@ void loop() {
   //Print all (Order: Time, Acc1, Acc2, Sound1, Sound2)
   Serial.print(millis() / 1000.0);
   Serial.print(",");
-  delay(50);
+  delay(250);
   Serial.print(a.acceleration.x);
   Serial.print(",");
   Serial.print(a.acceleration.y);
   Serial.print(",");
   Serial.print(a.acceleration.z);
   Serial.print(",");
-  delay(75);
+  delay(250);
   Serial.print(a2.acceleration.y);
   Serial.print(",");
-  delay(25);
+  delay(250);
   Serial.print(val);
   Serial.print(",");
-  delay(25);
+  delay(125);
   Serial.println(val2);
-  delay(25); //Total = 5 Hz
+  delay(125); //Total = 1000ms / 1000ms (delay) = 1 Hz
 }
