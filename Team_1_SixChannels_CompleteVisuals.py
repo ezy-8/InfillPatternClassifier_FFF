@@ -68,16 +68,50 @@ figureTwo.savefig('3 Figures' + f'/Accelerometer Channels for {date}_{pattern}_{
 print(len(xP), len(yP), len(zP), len(yN), len(sR), len(sL))
 # %% Fourier transform
 import numpy as np
-from scipy.fft import rfft, rfftfreq
-fourierTransform = rfft(sR)  # FFT of the right sound sensor
-sampling_rate = 1  # Hz, adjust as needed
-frequencies = rfftfreq(len(sR), d=1/sampling_rate)
 
-amplitude = 2 * np.abs(fourierTransform) / len(sR)
+# Compute the FFT
+signal = xP  # Choose one of the signals to analyze
 
-plt.plot(frequencies, amplitude)
-plt.title('Frequency Spectrum')
-plt.xlabel('Frequency [Hz]')
-plt.ylabel('Amplitude')
+fft_signal = np.fft.fft(signal)
+sample_rate = 1
+frequencies = np.fft.fftfreq(signal.size, d=1/sample_rate)
+
+# Plot the frequency spectrum
+plt.plot(frequencies[:signal.size//2], np.abs(fft_signal)[:signal.size//2])
+plt.xlabel("Frequency (Hz)")
+plt.ylabel("Amplitude")
+plt.title(f"Frequency Spectrum - xP")
+plt.grid(True)
+plt.show()
+
+# %%
+# Compute the FFT
+signal = yP  # Choose one of the signals to analyze
+
+fft_signal = np.fft.fft(signal)
+sample_rate = 1
+frequencies = np.fft.fftfreq(signal.size, d=1/sample_rate)
+
+# Plot the frequency spectrum
+plt.plot(frequencies[:signal.size//2], np.abs(fft_signal)[:signal.size//2])
+plt.xlabel("Frequency (Hz)")
+plt.ylabel("Amplitude")
+plt.title("Frequency Spectrum - yP")
+plt.grid(True)
+plt.show()
+# %%
+# Compute the FFT
+signal = yN  # Choose one of the signals to analyze
+
+fft_signal = np.fft.fft(signal)
+sample_rate = 1
+frequencies = np.fft.fftfreq(signal.size, d=1/sample_rate)
+
+# Plot the frequency spectrum
+plt.plot(frequencies[:signal.size//2], np.abs(fft_signal)[:signal.size//2])
+plt.xlabel("Frequency (Hz)")
+plt.ylabel("Amplitude")
+plt.title("Frequency Spectrum - yN")
+plt.grid(True)
 plt.show()
 # %%
