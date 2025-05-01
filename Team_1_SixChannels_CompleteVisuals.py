@@ -28,13 +28,13 @@ xP, yP, zP = dfNew[1], dfNew[2], dfNew[3]
 yN = dfNew[4]
 sR, sL = dfNew[5], dfNew[6]
 
-print(f'Loaded all data, dropped first 40 rows (or equivalent to almost {dropRowValue} seconds at {sampling})')
+print(f'Loaded all data, dropped first {dropRowValue} rows (or equivalent to almost {dropRowValue} seconds at {sampling})')
 
 #%% 3. Visualization
 # acoustic channels
 figureOne, axes = plt.subplots(2, 1, figsize=(20, 20))
 
-acousticTitles = ['Sound Sensor Right', 'Sound Sensor Left']
+acousticTitles = [f'Sound Sensor Right {pattern}', f'Sound Sensor Left {pattern}']
 allSounds = [sR, sL]
 
 for i, ax in enumerate(axes.flat):
@@ -66,3 +66,18 @@ plt.tight_layout()
 figureTwo.savefig('3 Figures' + f'/Accelerometer Channels for {date}_{pattern}_{sampling}_{run}.png')
 
 print(len(xP), len(yP), len(zP), len(yN), len(sR), len(sL))
+# %% Fourier transform
+import numpy as np
+from scipy.fft import rfft, rfftfreq
+fourierTransform = rfft(sR)  # FFT of the right sound sensor
+sampling_rate = 1  # Hz, adjust as needed
+frequencies = rfftfreq(len(sR), d=1/sampling_rate)
+
+amplitude = 2 * np.abs(fourierTransform) / len(sR)
+
+plt.plot(frequencies, amplitude)
+plt.title('Frequency Spectrum')
+plt.xlabel('Frequency [Hz]')
+plt.ylabel('Amplitude')
+plt.show()
+# %%

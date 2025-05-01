@@ -28,7 +28,7 @@ xP, yP, zP = dfNew[1], dfNew[2], dfNew[3]
 yN = dfNew[4]
 sR, sL = dfNew[5], dfNew[6]
 
-print(f'Loaded all data, dropped first 40 rows (or equivalent to almost {dropRowValue} seconds at {sampling})')
+print(f'Loaded all data, dropped first {dropRowValue} rows (or equivalent to almost {dropRowValue} seconds at {sampling})')
 
 # %% Data Restructuring (sample, window size, and features)
 import numpy as np
@@ -55,7 +55,7 @@ plt.legend()
 plt.title(f'Window of {j} samples')
 
 # %% FIXED (unadaptive) windows, adjust later and do not make adaptive
-steps = 10
+steps = 2
 
 if len(totalSamples) % steps != 0:
     print('Data length is not divisible by window size.')
@@ -76,3 +76,4 @@ else:
 np.save('4 Machine Learning' + f'/{date}_{pattern}_{sampling}_{run}_PreprocessedWith{steps}Windows.npy', totalSamplesNew)
 
 print(steps)
+# %%

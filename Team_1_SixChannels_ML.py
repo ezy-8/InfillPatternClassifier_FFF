@@ -1,12 +1,11 @@
-# %% Load libraries
+# %% Load libraries and dataset
 import numpy as np
 print('Libraries loaded')
 
-#%% Load dataset
 date = 20250430
 sampling = '1Hz6Ch'
 run = '1'
-steps = 10
+steps = 2
 
 pattern = ['concentric', 'hilbert', 'honeycomb', 'rectilinear', 'triangle']
 
@@ -48,7 +47,7 @@ print(X.shape, y.shape)
 
 # %% Split the dataset into training and testing sets
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 X_train = X_train.reshape(len(X_train), -1)
 X_test = X_test.reshape(len(X_test), -1)
 
@@ -67,13 +66,13 @@ print('Normalized training data:')
 print(X_train.shape, X_test.shape)
 
 #%% Apply PCA
-from sklearn.decomposition import PCA
+'''from sklearn.decomposition import PCA
 pca = PCA(n_components=5, random_state=42)  # Keep 95% of variance
 X_train = pca.fit_transform(X_train)
 X_test = pca.transform(X_test)
 
 print('PCA applied:')
-print(X_train.shape, X_test.shape)
+print(X_train.shape, X_test.shape)'''
 
 # %% Compare Algorithms
 # Load libraries
@@ -113,16 +112,34 @@ for name, model in models:
     print(f"{name}: {cv_results.mean():.3f} (±{cv_results.std():.3f})")
 
 #%% Best model
-choice = 5
+choice = 6 # 0: LR, 1: LDA, 2: KNN, 3: CART, 4: NB, 5: SVM, 6: RF, 7: Ada
 
 clf = models[choice][1] # first index indicates the model to use
+clf = SVC(kernel='rbf')  # SVM with RBF kernel
 clf.fit(X_train, y_train)
 print(f'Best model: {models[choice][0]}')
 
+from sklearn.model_selection import GridSearchCV
+from sklearn.svm import SVC
+
+param_grid = {
+    'C': [0.1, 1, 10],
+    'gamma': [1, 0.1, 0.01],
+    'kernel': ['rbf']
+}
+
+grid = GridSearchCV(SVC(), param_grid, refit=True, cv=5)
+grid.fit(X_train, y_train)
+print(grid.best_params_)
+
+from sklearn.neural_network import MLPClassifier
+mlp = MLPClassifier(hidden_layer_sizes=(5, 5), activation='tanh', solver='adam', max_iter=500, random_state=1)
+mlp.fit(X_train, y_train)
+
 #%% Evaluate the model
 from sklearn.metrics import classification_report, confusion_matrix
-y_pred = clf.predict(X_test)  # Reshape to 2D for sklearn
-print(f'Accuracy: {round(clf.score(X_test, y_test) * 100, 2)}%')
+y_pred = clf.predict(X_test)  # 
+print(f'Accuracy: {round(clf.score(X_test, y_test) * 100, 2)}%') #
 print('')
 print('Classification Report:\n', classification_report(y_test, y_pred))
 
@@ -141,3 +158,4 @@ plt.tight_layout()
 plt.show()
 
 # 04/30/2025 - Highest test accuracy: 63.16% with SVC (linear kernel) and PCA
+# %%
