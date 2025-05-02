@@ -1,13 +1,14 @@
 #%% import libraries (done with help from perplexity.ai)
-date = 20250430
+date = 20250502
 pattern = 'triangle'
 sampling = '5Hz'
+channels = '4'
 run = 1
 
 import serial
 import csv
 
-with open(f'{date}_{pattern}_{sampling}_{run}.csv', 'w', newline='') as csvfile:
+with open(f'{date}_{pattern}_{sampling}_{channels}_{run}.csv', 'w', newline='') as csvfile:
     try:
         ser = serial.Serial('COM3', 2000000, timeout=1)
         writer = csv.writer(csvfile)

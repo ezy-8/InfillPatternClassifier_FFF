@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 
 filePath = 'Team_1_SixChannels'
 
-date = 20250430
-pattern = 'triangle'
-sampling = '1Hz6Ch'
+date = 20250502
+pattern = 'concentric'
+sampling = '5Hz'
 run = '1'
 
 # p - print bed accelerometer; n - nozzle; s - sound sensor (Right, Left)
