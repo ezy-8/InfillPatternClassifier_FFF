@@ -1,7 +1,7 @@
 #%% import libraries (done with help from perplexity.ai)
 date = 20250430
 pattern = 'triangle'
-sampling = '1Hz6Ch'
+sampling = '5Hz'
 run = 1
 
 import serial
