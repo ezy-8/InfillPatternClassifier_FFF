@@ -2,18 +2,19 @@
 import numpy as np
 print('Libraries loaded')
 
-date = 20250430
-sampling = '1Hz6Ch'
+date = 20250502
+sampling = '5Hz'
+channels = '4'
 run = '1'
-steps = 50
+steps = 5
 
 pattern = ['concentric', 'hilbert', 'honeycomb', 'rectilinear', 'triangle']
 
-X0 = np.load('4 Machine Learning' + f'/{date}_{pattern[0]}_{sampling}_{run}_PreprocessedWith{steps}Windows.npy')
-X1 = np.load('4 Machine Learning' + f'/{date}_{pattern[1]}_{sampling}_{run}_PreprocessedWith{steps}Windows.npy')
-X2 = np.load('4 Machine Learning' + f'/{date}_{pattern[2]}_{sampling}_{run}_PreprocessedWith{steps}Windows.npy')
-X3 = np.load('4 Machine Learning' + f'/{date}_{pattern[3]}_{sampling}_{run}_PreprocessedWith{steps}Windows.npy')
-X4 = np.load('4 Machine Learning' + f'/{date}_{pattern[4]}_{sampling}_{run}_PreprocessedWith{steps}Windows.npy')
+X0 = np.load('4 Machine Learning' + f'/{date}_{pattern[0]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
+X1 = np.load('4 Machine Learning' + f'/{date}_{pattern[1]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
+X2 = np.load('4 Machine Learning' + f'/{date}_{pattern[2]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
+X3 = np.load('4 Machine Learning' + f'/{date}_{pattern[3]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
+X4 = np.load('4 Machine Learning' + f'/{date}_{pattern[4]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
 
 print(X0.shape, X1.shape, X2.shape, X3.shape, X4.shape)
 
@@ -74,53 +75,53 @@ X_test = pca.transform(X_test)
 print('PCA applied:')
 print(X_train.shape, X_test.shape)'''
 
-# %% Compare Algorithms
+# %% ML algorithms (Revisit Lecture Notes 7-9)
 # Load libraries
-from sklearn import model_selection, datasets
-from sklearn.linear_model import LogisticRegression
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.svm import SVC
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn import model_selection
+
+# covered in class
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.naive_bayes import GaussianNB
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neural_network import MLPClassifier
+
+# own experimentation
+from sklearn.svm import SVC
+#import tensorflow as tf
 
 # Configure evaluation
 kfold = model_selection.KFold(n_splits=10)
 scoring = 'accuracy'
 
-models = [
-    ('LR', LogisticRegression(max_iter=5000)),
-    ('LDA', LinearDiscriminantAnalysis()),
-    ('KNN', KNeighborsClassifier()),
-    ('CART', DecisionTreeClassifier()),
-    ('NB', GaussianNB()),
-    ('SVM', SVC()),
-    ('RF', RandomForestClassifier()),
-    ('Ada', AdaBoostClassifier())
-]
+models = [('KNN', KNeighborsClassifier(n_neighbors=10, metric='euclidean')),
+         ('Decision Tree', DecisionTreeClassifier(max_depth=20, random_state=42)), 
+         ('Random Forest', RandomForestClassifier(n_estimators=100, max_depth=20, random_state=42)),
+         ('MLP', MLPClassifier(hidden_layer_sizes=(100, 20), max_iter=1000, 
+                               activation='relu', random_state=42)),
+        ('SVM', SVC(kernel='rbf', C=1, gamma='scale', random_state=42))]
 
 results = []
 names = []
-
 for name, model in models:
-    cv_results = model_selection.cross_val_score(
-        model, X_train, y_train, cv=kfold, scoring=scoring
-    )
+    cv_results = model_selection.cross_val_score(model, X_train, y_train, cv=kfold, scoring=scoring)
     results.append(cv_results)
     names.append(name)
     print(f"{name}: {cv_results.mean():.3f} (±{cv_results.std():.3f})")
 
 #%% Best model
-choice = 2 # 0: LR, 1: LDA, 2: KNN, 3: CART, 4: NB, 5: SVM, 6: RF, 7: Ada
+choice = -1
+
 clf = models[choice][1] # first index indicates the model to use
+clf = SVC(random_state=0)
 clf.fit(X_train, y_train)
-print(f'Best model: {models[choice][0]}')
 
 #%% Evaluate the model
 from sklearn.metrics import classification_report, confusion_matrix
 y_pred = clf.predict(X_test)  # 
-print(f'Accuracy: {round(clf.score(X_test, y_test) * 100, 2)}%') #
+
+print(f'Training Accuracy: {round(clf.score(X_train, y_train) * 100, 2)}%') #
+print(f'Testing Accuracy: {round(clf.score(X_test, y_test) * 100, 2)}%') #
+
 print('')
 print('Classification Report:\n', classification_report(y_test, y_pred))
 
@@ -138,5 +139,4 @@ plt.title('Confusion Matrix')
 plt.tight_layout()
 plt.show()
 
-# 04/30/2025 - Highest test accuracy: 63.16% with SVC (linear kernel) and PCA
-# %%
+# %% Bonus: 1D CNN

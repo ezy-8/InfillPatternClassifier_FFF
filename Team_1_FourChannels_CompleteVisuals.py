@@ -2,33 +2,33 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-filePath = 'Team_1_SixChannels'
+filePath = 'Team_1_FourChannels'
 
 date = 20250502
-pattern = 'concentric'
+pattern = 'triangle'
+channels = '4'
 sampling = '5Hz'
 run = '1'
 
 # p - print bed accelerometer; n - nozzle; s - sound sensor (Right, Left)
-df = pd.read_csv(filePath + f'/{date}_{pattern}_{sampling}_{run}.csv',
-                        names=['Time', 'Xp', 'Yp', 'Zp', 'Yn', 'SoundR', 'SoundL'])
+df = pd.read_csv(filePath + f'/{date}_{pattern}_{sampling}_{channels}_{run}.csv', 
+                 names=['Time', 'Yp', 'Yn', 'SoundR', 'SoundL'])
 dfNew = df['Time'].str.split(',', expand=True)
 dfNew = dfNew.apply(pd.to_numeric, errors='coerce')
 
-# define channels and eliminate bad rows (the first 40 seconds where no printing occurs)
-dropRowValue = 30
+# remove first row anomaly at yP (which is the only channel that acts up when data collection starts)
+badRow = 1
+dfNew = dfNew[badRow:]
+
+#define channels and eliminate bad rows (the first 30 seconds where no printing occurs, but 5Hz so 150 rows)
+dropRowValue = 150
 dfNew = dfNew[dropRowValue:]
 
-# replace anomalies at yP (which is the only channel that acts up)
-minIndex = dfNew[2].idxmin()
-dfNew.at[minIndex, 2] = dfNew[2][minIndex - 1]  # replace with the previous value
-
 time = dfNew[0]  # time in seconds
-xP, yP, zP = dfNew[1], dfNew[2], dfNew[3]
-yN = dfNew[4]
-sR, sL = dfNew[5], dfNew[6]
+yP, yN = dfNew[1], dfNew[2]
+sR, sL = dfNew[3], dfNew[4]
 
-print(f'Loaded all data, dropped first {dropRowValue} rows (or equivalent to almost {dropRowValue} seconds at {sampling})')
+print(f'Loaded all data, dropped first {dropRowValue} rows (or equivalent to almost 30 seconds at {sampling})')
 
 #%% 3. Visualization
 # acoustic channels
@@ -45,15 +45,14 @@ for i, ax in enumerate(axes.flat):
 plt.tight_layout()
 
 # save results
-figureOne.savefig('3 Figures' + f'/Acoustic Channels for {date}_{pattern}_{sampling}_{run}.png')
+figureOne.savefig('3 Figures' + f'/Acoustic Channels for {date}_{pattern}_{sampling}_{channels}_{run}.png')
 
 #%% vibration channels of print bed accelerometer
-figureTwo, axes = plt.subplots(4, 1, figsize=(20, 20))
+figureTwo, axes = plt.subplots(2, 1, figsize=(20, 20))
 
-vibrationTitles = ['Print Bed Movement [X]', 'Print Bed Movement [Y]', 
-                   'Print Bed Movement [Z]', 'Nozzle Movement [Y]']
+vibrationTitles = ['Print Bed Movement [Y]', 'Nozzle Movement [Y]']
 
-allVibrations = [xP, yP, zP, yN]
+allVibrations = [yP, yN]
 
 for i, ax in enumerate(axes.flat):
     ax.set_title(vibrationTitles[i])
@@ -63,55 +62,8 @@ for i, ax in enumerate(axes.flat):
 plt.tight_layout()
 
 # save results
-figureTwo.savefig('3 Figures' + f'/Accelerometer Channels for {date}_{pattern}_{sampling}_{run}.png')
+figureTwo.savefig('3 Figures' + f'/Accelerometer Channels for {date}_{pattern}_{sampling}_{channels}_{run}.png')
 
-print(len(xP), len(yP), len(zP), len(yN), len(sR), len(sL))
-# %% Fourier transform
-import numpy as np
+print(len(yP), len(yN), len(sR), len(sL))
 
-# Compute the FFT
-signal = xP  # Choose one of the signals to analyze
-
-fft_signal = np.fft.fft(signal)
-sample_rate = 1
-frequencies = np.fft.fftfreq(signal.size, d=1/sample_rate)
-
-# Plot the frequency spectrum
-plt.plot(frequencies[:signal.size//2], np.abs(fft_signal)[:signal.size//2])
-plt.xlabel("Frequency (Hz)")
-plt.ylabel("Amplitude")
-plt.title(f"Frequency Spectrum - xP")
-plt.grid(True)
-plt.show()
-
-# %%
-# Compute the FFT
-signal = yP  # Choose one of the signals to analyze
-
-fft_signal = np.fft.fft(signal)
-sample_rate = 1
-frequencies = np.fft.fftfreq(signal.size, d=1/sample_rate)
-
-# Plot the frequency spectrum
-plt.plot(frequencies[:signal.size//2], np.abs(fft_signal)[:signal.size//2])
-plt.xlabel("Frequency (Hz)")
-plt.ylabel("Amplitude")
-plt.title("Frequency Spectrum - yP")
-plt.grid(True)
-plt.show()
-# %%
-# Compute the FFT
-signal = yN  # Choose one of the signals to analyze
-
-fft_signal = np.fft.fft(signal)
-sample_rate = 1
-frequencies = np.fft.fftfreq(signal.size, d=1/sample_rate)
-
-# Plot the frequency spectrum
-plt.plot(frequencies[:signal.size//2], np.abs(fft_signal)[:signal.size//2])
-plt.xlabel("Frequency (Hz)")
-plt.ylabel("Amplitude")
-plt.title("Frequency Spectrum - yN")
-plt.grid(True)
-plt.show()
 # %%
