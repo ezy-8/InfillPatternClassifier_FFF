@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 filePath = 'Team_1_SixChannels'
 
 date = 20250430
-pattern = 'triangle'
+pattern = 'concentric'  # 'concentric', 'hilbert', 'honeycomb', 'rectilinear', 'triangle'
 sampling = '1Hz6Ch'
 run = '1'
 
@@ -55,7 +55,7 @@ plt.legend()
 plt.title(f'Window of {j} samples')
 
 # %% FIXED (unadaptive) windows, adjust later and do not make adaptive
-steps = 2
+steps = 50
 
 if len(totalSamples) % steps != 0:
     print('Data length is not divisible by window size.')

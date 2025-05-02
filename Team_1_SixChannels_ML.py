@@ -5,7 +5,7 @@ print('Libraries loaded')
 date = 20250430
 sampling = '1Hz6Ch'
 run = '1'
-steps = 2
+steps = 50
 
 pattern = ['concentric', 'hilbert', 'honeycomb', 'rectilinear', 'triangle']
 
@@ -112,29 +112,10 @@ for name, model in models:
     print(f"{name}: {cv_results.mean():.3f} (±{cv_results.std():.3f})")
 
 #%% Best model
-choice = 6 # 0: LR, 1: LDA, 2: KNN, 3: CART, 4: NB, 5: SVM, 6: RF, 7: Ada
-
+choice = 2 # 0: LR, 1: LDA, 2: KNN, 3: CART, 4: NB, 5: SVM, 6: RF, 7: Ada
 clf = models[choice][1] # first index indicates the model to use
-clf = SVC(kernel='rbf')  # SVM with RBF kernel
 clf.fit(X_train, y_train)
 print(f'Best model: {models[choice][0]}')
-
-from sklearn.model_selection import GridSearchCV
-from sklearn.svm import SVC
-
-param_grid = {
-    'C': [0.1, 1, 10],
-    'gamma': [1, 0.1, 0.01],
-    'kernel': ['rbf']
-}
-
-grid = GridSearchCV(SVC(), param_grid, refit=True, cv=5)
-grid.fit(X_train, y_train)
-print(grid.best_params_)
-
-from sklearn.neural_network import MLPClassifier
-mlp = MLPClassifier(hidden_layer_sizes=(5, 5), activation='tanh', solver='adam', max_iter=500, random_state=1)
-mlp.fit(X_train, y_train)
 
 #%% Evaluate the model
 from sklearn.metrics import classification_report, confusion_matrix
