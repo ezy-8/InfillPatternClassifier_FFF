@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 filePath = 'Team_1_FourChannels'
 
 date = 20250502
-pattern = 'triangle'
+pattern = 'concentric'
 channels = '4'
 sampling = '5Hz'
 run = '1'
@@ -34,31 +34,36 @@ print(f'Loaded all data, dropped first {dropRowValue} rows (or equivalent to alm
 # acoustic channels
 figureOne, axes = plt.subplots(2, 1, figsize=(20, 20))
 
-acousticTitles = [f'Sound Sensor Right {pattern}', f'Sound Sensor Left {pattern}']
+acousticTitles = [f'Right sound sensor for {pattern} pattern', f'Left sound sensor for {pattern} pattern']
 allSounds = [sR, sL]
+colors = ['r', 'orange']
+
+fontSize = 36
 
 for i, ax in enumerate(axes.flat):
-    ax.set_title(acousticTitles[i])
-    ax.plot(allSounds[i]) 
-    ax.set_xlabel('Samples')
-    ax.set_ylabel('Amplitude (volts)')
+    ax.set_title(acousticTitles[i], fontsize=fontSize)
+    ax.plot(allSounds[i], color=colors[i]) 
+    ax.set_xlabel('Samples', fontsize=fontSize)
+    ax.set_ylabel('Amplitude (volts)', fontsize=fontSize)
+    ax.tick_params(axis='both', which='major', labelsize=fontSize)
 plt.tight_layout()
 
 # save results
 figureOne.savefig('3 Figures' + f'/Acoustic Channels for {date}_{pattern}_{sampling}_{channels}_{run}.png')
 
 #%% vibration channels of print bed accelerometer
-figureTwo, axes = plt.subplots(2, 1, figsize=(20, 20))
+figureTwo, axes = plt.subplots(2, 1, figsize=(15, 15))
 
-vibrationTitles = ['Print Bed Movement [Y]', 'Nozzle Movement [Y]']
-
+vibrationTitles = [f'Print bed movement for {pattern} pattern', f'Nozzle movement for {pattern} pattern']
 allVibrations = [yP, yN]
+colors = ['g', 'b']
 
 for i, ax in enumerate(axes.flat):
-    ax.set_title(vibrationTitles[i])
-    ax.plot(allVibrations[i]) 
-    ax.set_xlabel('Samples')
-    ax.set_ylabel('Acceleration (m/s^2)')
+    ax.set_title(vibrationTitles[i], fontsize=fontSize)
+    ax.plot(allVibrations[i], color=colors[i]) 
+    ax.set_xlabel('Samples', fontsize=fontSize)
+    ax.set_ylabel('Acceleration (m/s^2)', fontsize=fontSize)
+    ax.tick_params(axis='both', which='major', labelsize=fontSize)
 plt.tight_layout()
 
 # save results

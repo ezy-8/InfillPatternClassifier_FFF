@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 filePath = 'Team_1_FourChannels'
 
 date = 20250502
-pattern = 'triangle'
+pattern = 'concentric'
 channels = '4'
 sampling = '5Hz'
 run = '1'
