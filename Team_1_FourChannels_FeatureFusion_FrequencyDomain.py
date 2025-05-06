@@ -5,10 +5,11 @@ import matplotlib.pyplot as plt
 filePath = 'Team_1_FourChannels'
 
 date = 20250502
-pattern = 'triangle'
+pattern = 'concentric'
 channels = '4'
 sampling = '5Hz'
 run = '1'
+steps = 100
 
 # p - print bed accelerometer; n - nozzle; s - sound sensor (Right, Left)
 df = pd.read_csv(filePath + f'/{date}_{pattern}_{sampling}_{channels}_{run}.csv', 
@@ -30,26 +31,95 @@ sR, sL = dfNew[3], dfNew[4]
 
 print(f'Loaded all data, dropped first {dropRowValue} rows (or equivalent to almost 30 seconds at {sampling})')
 
-# %% Restructure data (sample, features)
+# %% Restructure data (channel, all dimensions)
 import numpy as np
 
-totalSamples = []
+printBed = []
+nozzle = []
+soundRight = []
+soundLeft = []
 
 for i in range(dropRowValue+1, len(df)):
-    totalSamples.append(np.array([yP.loc[i], yN.loc[i], sR.loc[i], sL.loc[i]]))
-    
-totalSamples = np.array(totalSamples)
-print(f'Total samples: {totalSamples.shape}')
+    printBed.append(yP.loc[i])
+    nozzle.append(yN.loc[i])
+    soundRight.append(sR.loc[i])
+    soundLeft.append(sL.loc[i])
+
+printBed = np.array(printBed)
+nozzle = np.array(nozzle)
+soundRight = np.array(soundRight)
+soundLeft = np.array(soundLeft)
+
+print('Print Bed:', printBed.shape)
+print('Nozzle:', nozzle.shape)
+print('Sound Right:', soundRight.shape)
+print('Sound Left:', soundLeft.shape)
+
+# %% Restructure data (chunking each dimension from each channel)
+if len(printBed) % steps != 0:
+    removal = len(printBed) % steps
+
+    printBedNew, nozzleNew = printBed[:-removal], nozzle[:-removal]
+    soundRightNew, soundLeftNew = soundRight[:-removal], soundLeft[:-removal]
+
+    printBedNew, nozzleNew = printBedNew.reshape(-1, steps), nozzleNew.reshape(-1, steps)
+    soundRightNew, soundLeftNew = soundRightNew.reshape(-1, steps), soundLeftNew.reshape(-1, steps)
+
+    print(f'Data length is not divisible by window size. Removed {removal} samples to make the data length divisible by {steps}.')
+else:
+    printBedNew, nozzleNew = printBed.reshape(-1, steps), nozzle.reshape(-1, steps)
+    soundRightNew, soundLeftNew = soundRight.reshape(-1, steps), soundLeft.reshape(-1, steps)
+
+    print('Data length is divisible by window size.')
+
+print('Print Bed:', printBedNew.shape)
+print('Nozzle:', nozzleNew.shape)
+print('Sound Right:', soundRightNew.shape)
+print('Sound Left:', soundLeftNew.shape)
+
+# %% Extract frequency domain features
+from scipy.fft import fft
+import scipy.stats as stats
+
+printBedNew, nozzleNew = np.abs(fft(printBedNew**2) / len(printBedNew)), np.abs(fft(nozzleNew**2) / len(nozzleNew))
+soundRightNew, soundLeftNew = np.abs(fft(soundRightNew**2) / len(soundRightNew)), np.abs(fft(soundLeftNew**2) / len(soundLeftNew))
+
+printBedFDF, nozzleFDF = [], []
+soundRightFDF, soundLeftFDF = [], []
+
+for i in printBedNew:
+    printBedFDF.append([np.max(i), np.sum(i), np.mean(i), np.var(i), np.max(np.abs(i)), stats.skew(i), stats.kurtosis(i)])
+for j in nozzleNew:
+    nozzleFDF.append([np.max(j), np.sum(j), np.mean(j), np.var(j), np.max(np.abs(j)), stats.skew(j), stats.kurtosis(j)])
+for k in soundRightNew:
+    soundRightFDF.append([np.max(k), np.sum(k), np.mean(k), np.var(k), np.max(np.abs(k)), stats.skew(k), stats.kurtosis(k)])
+for l in soundLeftNew:
+    soundLeftFDF.append([np.max(l), np.sum(l), np.mean(l), np.var(l), np.max(np.abs(l)), stats.skew(l), stats.kurtosis(l)])
+
+printBedFDF, nozzleFDF = np.array(printBedFDF), np.array(nozzleFDF)
+soundRightFDF, soundLeftFDF = np.array(soundRightFDF), np.array(soundLeftFDF)
+
+print('Print Bed:', printBedFDF.shape)
+print('Nozzle:', nozzleFDF.shape)
+print('Sound Right:', soundRightFDF.shape)
+print('Sound Left:', soundLeftFDF.shape)
+
+#%% Combine data
+tdf = np.concatenate([printBedFDF, nozzleFDF, soundRightFDF, soundLeftFDF])
+print(tdf.shape)
+
+#%% Preprocessed features in the time domain
+np.save('4 Machine Learning' + f'/1 {date}_{pattern}_{sampling}_{channels}_{run}_FrequencyDomainFeatures_{steps}.npy', tdf)
 
 # %% Visualize windows
 import matplotlib.pyplot as plt
 
-i, j = 0, 5  # i and j are the start and end of the window
+i, j = 0, steps  # i and j are the start and end of the window
 
-signal_0 = totalSamples[:, 0][i:j]
-signal_1 = totalSamples[:, 1][i:j]
-signal_2 = totalSamples[:, 2][i:j]
-signal_3 = totalSamples[:, 3][i:j]
+signal_0 = printBedNew[:, 0][i:j]
+signal_1 = nozzleNew[:, 1][i:j]
+signal_2 = soundRightNew[:, 2][i:j]
+signal_3 = soundLeftNew[:, 3][i:j]
 
 plt.figure(0)
 plt.plot(signal_0, label='Y nozzle (X)', color='r')
@@ -63,80 +133,3 @@ plt.legend()
 plt.figure(3)
 plt.plot(signal_3, label='Sound Left', color='blue')
 plt.legend()
-
-#%% Restructure data (sample, window size, features)
-steps = 5
-ch = 4
-
-if len(totalSamples) % steps != 0:
-    print('Data length is not divisible by window size.')
-    # Truncate the data to make it divisible by the window size
-    removal = len(totalSamples) % steps
-    # Remove the last few samples
-    totalSamplesNew = totalSamples[:-removal]
-    print(f'Removed {removal} samples to make the data length divisible by {steps}.')
-    # Reshape into 3d array
-    totalSamplesNew = totalSamplesNew.reshape(-1, steps, ch)
-    print(totalSamplesNew.shape)
-else:
-    print('Data length is divisible by window size.')
-    totalSamplesNew = totalSamples.reshape(-1, steps, ch)
-    print(totalSamplesNew.shape)
-
-#%% TIME DOMAIN
-import scipy.stats as stats
-
-totalSamplesFlat = totalSamplesNew.reshape(len(totalSamplesNew), -1)
-
-def timeDomainFeatures(signal):
-    Min, Max, Mean, RMS, Var, Std, Power, Peak, Skew, Kurtosis = [], [], [], [], [], [], [], [], [], []
-    P2P, CrestFactor, FormFactor, PulseIndicator = [], [], [], []
-    
-    Min.append(np.min(signal))
-    Max.append(np.max(signal))
-    Mean.append(np.mean(signal))
-    RMS.append(np.sqrt(np.mean(signal**2)))
-    Var.append(np.var(signal))
-    Std.append(np.std(signal))
-    Power.append(np.mean(signal**2))
-    Peak.append(np.max(np.abs(signal)))
-    P2P.append(np.ptp(signal))
-    CrestFactor.append(np.max(np.abs(signal))/np.sqrt(np.mean(signal**2)))
-    Skew.append(stats.skew(signal))
-    Kurtosis.append(stats.kurtosis(signal))
-    FormFactor.append(np.sqrt(np.mean(signal**2))/np.mean(signal))
-    PulseIndicator.append(np.max(np.abs(signal))/np.mean(signal))
-    
-    return np.array([Min, Max, Mean, RMS, Var, Std, Power, Peak, Skew, Kurtosis, 
-                     P2P, CrestFactor, FormFactor, PulseIndicator])
-    
-tdf = timeDomainFeatures(totalSamplesFlat)
-print(tdf.shape)
-
-#%% Preprocessed features in the time domain
-tdf = np.concatenate([signal_0_tdf, signal_1_tdf, signal_2_tdf, signal_3_tdf], axis=1)
-print(tdf.shape)
-
-np.save('4 Machine Learning' + f'/{date}_{pattern}_{sampling}_{channels}_{run}_TimeDomainFeatures.npy', tdf)
-
-#%% FREQUENCY DOMAIN
-'''
-from scipy.fft import fft, fftfreq
-
-ft = fft(X)
-S = np.abs(ft**2)/len(df)
-
-Max_f, Sum_f, Mean_f, Var_f, Peak_f, Skew_f, Kurtosis_f = [], [], [], [], [], [], []
-
-Max_f.append(np.max(S))
-Sum_f.append(np.sum(S))
-Mean_f.append(np.mean(S))
-Var_f.append(np.var(S))
-Peak_f.append(np.max(np.abs(S)))
-Skew_f.append(stats.skew(X))
-Kurtosis_f.append(stats.kurtosis(X))
-
-# save preprocessed data
-np.save('4 Machine Learning' + f'/{date}_{pattern}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy', totalSamplesNew)
-
-print(steps)'''

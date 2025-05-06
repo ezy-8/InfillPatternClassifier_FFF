@@ -6,21 +6,27 @@ date = 20250502
 sampling = '5Hz'
 channels = '4'
 run = '1'
-steps = 5
+steps = 100
 
 pattern = ['concentric', 'hilbert', 'honeycomb', 'rectilinear', 'triangle']
 
-X0 = np.load('4 Machine Learning' + f'/{date}_{pattern[0]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
+'''X0 = np.load('4 Machine Learning' + f'/{date}_{pattern[0]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
 X1 = np.load('4 Machine Learning' + f'/{date}_{pattern[1]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
 X2 = np.load('4 Machine Learning' + f'/{date}_{pattern[2]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
 X3 = np.load('4 Machine Learning' + f'/{date}_{pattern[3]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
-X4 = np.load('4 Machine Learning' + f'/{date}_{pattern[4]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
+X4 = np.load('4 Machine Learning' + f'/{date}_{pattern[4]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')'''
 
-'''X0 = np.load('4 Machine Learning' + f'/{date}_{pattern[0]}_{sampling}_{channels}_{run}_TimeDomainFeatures.npy')
-X1 = np.load('4 Machine Learning' + f'/{date}_{pattern[1]}_{sampling}_{channels}_{run}_TimeDomainFeatures.npy')
-X2 = np.load('4 Machine Learning' + f'/{date}_{pattern[2]}_{sampling}_{channels}_{run}_TimeDomainFeatures.npy')
-X3 = np.load('4 Machine Learning' + f'/{date}_{pattern[3]}_{sampling}_{channels}_{run}_TimeDomainFeatures.npy')
-X4 = np.load('4 Machine Learning' + f'/{date}_{pattern[4]}_{sampling}_{channels}_{run}_TimeDomainFeatures.npy')'''
+#X0 = np.load('4 Machine Learning' + f'/0 {date}_{pattern[0]}_{sampling}_{channels}_{run}_TimeDomainFeatures_{steps}.npy')
+#X1 = np.load('4 Machine Learning' + f'/0 {date}_{pattern[1]}_{sampling}_{channels}_{run}_TimeDomainFeatures_{steps}.npy')
+#X2 = np.load('4 Machine Learning' + f'/0 {date}_{pattern[2]}_{sampling}_{channels}_{run}_TimeDomainFeatures_{steps}.npy')
+#X3 = np.load('4 Machine Learning' + f'/0 {date}_{pattern[3]}_{sampling}_{channels}_{run}_TimeDomainFeatures_{steps}.npy')
+#X4 = np.load('4 Machine Learning' + f'/0 {date}_{pattern[4]}_{sampling}_{channels}_{run}_TimeDomainFeatures_{steps}.npy')
+
+X0 = np.load('4 Machine Learning' + f'/1 {date}_{pattern[0]}_{sampling}_{channels}_{run}_FrequencyDomainFeatures_{steps}.npy')
+X1 = np.load('4 Machine Learning' + f'/1 {date}_{pattern[1]}_{sampling}_{channels}_{run}_FrequencyDomainFeatures_{steps}.npy')
+X2 = np.load('4 Machine Learning' + f'/1 {date}_{pattern[2]}_{sampling}_{channels}_{run}_FrequencyDomainFeatures_{steps}.npy')
+X3 = np.load('4 Machine Learning' + f'/1 {date}_{pattern[3]}_{sampling}_{channels}_{run}_FrequencyDomainFeatures_{steps}.npy')
+X4 = np.load('4 Machine Learning' + f'/1 {date}_{pattern[4]}_{sampling}_{channels}_{run}_FrequencyDomainFeatures_{steps}.npy')
 
 print(X0.shape, X1.shape, X2.shape, X3.shape, X4.shape)
 
@@ -73,13 +79,13 @@ print('Normalized training data:')
 print(X_train.shape, X_test.shape)
 
 #%% Apply PCA
-from sklearn.decomposition import PCA
-pca = PCA(n_components=5, random_state=42)  # Keep 95% of variance
+'''from sklearn.decomposition import PCA
+pca = PCA(n_components=2, random_state=42)  # Keep 95% of variance
 X_train = pca.fit_transform(X_train)
 X_test = pca.transform(X_test)
 
 print('PCA applied:')
-print(X_train.shape, X_test.shape)
+print(X_train.shape, X_test.shape)'''
 
 # %% ML algorithms (Revisit Lecture Notes 7-9)
 # Load libraries
@@ -100,7 +106,7 @@ kfold = model_selection.KFold(n_splits=10)
 scoring = 'accuracy'
 
 models = [('KNN', KNeighborsClassifier(n_neighbors=10, metric='euclidean')),
-         ('Decision Tree', DecisionTreeClassifier(max_depth=20, random_state=42)), 
+         ('Decision Tree', DecisionTreeClassifier(max_depth=30, random_state=42)), 
          ('Random Forest', RandomForestClassifier(n_estimators=100, max_depth=20, random_state=42)),
          ('MLP', MLPClassifier(hidden_layer_sizes=(100, 20), max_iter=1000, 
                                activation='relu', random_state=42)),
@@ -115,7 +121,7 @@ for name, model in models:
     print(f"{name}: {cv_results.mean():.3f} (±{cv_results.std():.3f})")
 
 #%% Best model
-choice = 2
+choice = 1
 
 clf = models[choice][1] # first index indicates the model to use
 #clf = SVC(random_state=0)
