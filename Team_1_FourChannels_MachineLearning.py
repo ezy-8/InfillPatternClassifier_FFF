@@ -16,6 +16,12 @@ X2 = np.load('4 Machine Learning' + f'/{date}_{pattern[2]}_{sampling}_{channels}
 X3 = np.load('4 Machine Learning' + f'/{date}_{pattern[3]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
 X4 = np.load('4 Machine Learning' + f'/{date}_{pattern[4]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
 
+'''X0 = np.load('4 Machine Learning' + f'/{date}_{pattern[0]}_{sampling}_{channels}_{run}_TimeDomainFeatures.npy')
+X1 = np.load('4 Machine Learning' + f'/{date}_{pattern[1]}_{sampling}_{channels}_{run}_TimeDomainFeatures.npy')
+X2 = np.load('4 Machine Learning' + f'/{date}_{pattern[2]}_{sampling}_{channels}_{run}_TimeDomainFeatures.npy')
+X3 = np.load('4 Machine Learning' + f'/{date}_{pattern[3]}_{sampling}_{channels}_{run}_TimeDomainFeatures.npy')
+X4 = np.load('4 Machine Learning' + f'/{date}_{pattern[4]}_{sampling}_{channels}_{run}_TimeDomainFeatures.npy')'''
+
 print(X0.shape, X1.shape, X2.shape, X3.shape, X4.shape)
 
 #%% Balance the datasets
@@ -67,13 +73,13 @@ print('Normalized training data:')
 print(X_train.shape, X_test.shape)
 
 #%% Apply PCA
-'''from sklearn.decomposition import PCA
+from sklearn.decomposition import PCA
 pca = PCA(n_components=5, random_state=42)  # Keep 95% of variance
 X_train = pca.fit_transform(X_train)
 X_test = pca.transform(X_test)
 
 print('PCA applied:')
-print(X_train.shape, X_test.shape)'''
+print(X_train.shape, X_test.shape)
 
 # %% ML algorithms (Revisit Lecture Notes 7-9)
 # Load libraries
@@ -109,10 +115,10 @@ for name, model in models:
     print(f"{name}: {cv_results.mean():.3f} (±{cv_results.std():.3f})")
 
 #%% Best model
-choice = -1
+choice = 2
 
 clf = models[choice][1] # first index indicates the model to use
-clf = SVC(random_state=0)
+#clf = SVC(random_state=0)
 clf.fit(X_train, y_train)
 
 #%% Evaluate the model
