@@ -32,13 +32,13 @@ print(f'Loaded all data, dropped first {dropRowValue} rows (or equivalent to alm
 
 #%% 3. Visualization
 # acoustic channels
-figureOne, axes = plt.subplots(2, 1, figsize=(20, 20))
+figureOne, axes = plt.subplots(2, 1, figsize=(15, 20))
 
 acousticTitles = [f'Right sound sensor for {pattern} pattern', f'Left sound sensor for {pattern} pattern']
 allSounds = [sR, sL]
 colors = ['r', 'orange']
 
-fontSize = 36
+fontSize = 30
 
 for i, ax in enumerate(axes.flat):
     ax.set_title(acousticTitles[i], fontsize=fontSize)
@@ -52,7 +52,7 @@ plt.tight_layout()
 figureOne.savefig('3 Figures' + f'/Acoustic Channels for {date}_{pattern}_{sampling}_{channels}_{run}.png')
 
 #%% vibration channels of print bed accelerometer
-figureTwo, axes = plt.subplots(2, 1, figsize=(15, 15))
+figureTwo, axes = plt.subplots(2, 1, figsize=(15, 20))
 
 vibrationTitles = [f'Print bed movement for {pattern} pattern', f'Nozzle movement for {pattern} pattern']
 allVibrations = [yP, yN]

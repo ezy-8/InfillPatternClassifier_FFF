@@ -10,23 +10,34 @@ steps = 100
 
 pattern = ['concentric', 'hilbert', 'honeycomb', 'rectilinear', 'triangle']
 
-'''X0 = np.load('4 Machine Learning' + f'/{date}_{pattern[0]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
-X1 = np.load('4 Machine Learning' + f'/{date}_{pattern[1]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
-X2 = np.load('4 Machine Learning' + f'/{date}_{pattern[2]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
-X3 = np.load('4 Machine Learning' + f'/{date}_{pattern[3]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
-X4 = np.load('4 Machine Learning' + f'/{date}_{pattern[4]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')'''
+## No Feature Extraction
+#X0 = np.load('4 Machine Learning' + f'/{date}_{pattern[0]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
+#X1 = np.load('4 Machine Learning' + f'/{date}_{pattern[1]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
+#X2 = np.load('4 Machine Learning' + f'/{date}_{pattern[2]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
+#X3 = np.load('4 Machine Learning' + f'/{date}_{pattern[3]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
+#X4 = np.load('4 Machine Learning' + f'/{date}_{pattern[4]}_{sampling}_{channels}_{run}_PreprocessedWith{steps}Windows.npy')
 
+## Time Domain
 #X0 = np.load('4 Machine Learning' + f'/0 {date}_{pattern[0]}_{sampling}_{channels}_{run}_TimeDomainFeatures_{steps}.npy')
 #X1 = np.load('4 Machine Learning' + f'/0 {date}_{pattern[1]}_{sampling}_{channels}_{run}_TimeDomainFeatures_{steps}.npy')
 #X2 = np.load('4 Machine Learning' + f'/0 {date}_{pattern[2]}_{sampling}_{channels}_{run}_TimeDomainFeatures_{steps}.npy')
 #X3 = np.load('4 Machine Learning' + f'/0 {date}_{pattern[3]}_{sampling}_{channels}_{run}_TimeDomainFeatures_{steps}.npy')
 #X4 = np.load('4 Machine Learning' + f'/0 {date}_{pattern[4]}_{sampling}_{channels}_{run}_TimeDomainFeatures_{steps}.npy')
 
+## Frequency Domain
 X0 = np.load('4 Machine Learning' + f'/1 {date}_{pattern[0]}_{sampling}_{channels}_{run}_FrequencyDomainFeatures_{steps}.npy')
 X1 = np.load('4 Machine Learning' + f'/1 {date}_{pattern[1]}_{sampling}_{channels}_{run}_FrequencyDomainFeatures_{steps}.npy')
 X2 = np.load('4 Machine Learning' + f'/1 {date}_{pattern[2]}_{sampling}_{channels}_{run}_FrequencyDomainFeatures_{steps}.npy')
 X3 = np.load('4 Machine Learning' + f'/1 {date}_{pattern[3]}_{sampling}_{channels}_{run}_FrequencyDomainFeatures_{steps}.npy')
 X4 = np.load('4 Machine Learning' + f'/1 {date}_{pattern[4]}_{sampling}_{channels}_{run}_FrequencyDomainFeatures_{steps}.npy')
+
+## Wavelet Domain
+family = 'mexh'
+X0 = np.load('4 Machine Learning' + f'/2 {date}_{pattern[0]}_{sampling}_{channels}_{run}_WaveletFeatures_{steps}_{family}.npy')
+X1 = np.load('4 Machine Learning' + f'/2 {date}_{pattern[1]}_{sampling}_{channels}_{run}_WaveletFeatures_{steps}_{family}.npy')
+X2 = np.load('4 Machine Learning' + f'/2 {date}_{pattern[2]}_{sampling}_{channels}_{run}_WaveletFeatures_{steps}_{family}.npy')
+X3 = np.load('4 Machine Learning' + f'/2 {date}_{pattern[3]}_{sampling}_{channels}_{run}_WaveletFeatures_{steps}_{family}.npy')
+X4 = np.load('4 Machine Learning' + f'/2 {date}_{pattern[4]}_{sampling}_{channels}_{run}_WaveletFeatures_{steps}_{family}.npy')
 
 print(X0.shape, X1.shape, X2.shape, X3.shape, X4.shape)
 
@@ -74,18 +85,8 @@ from sklearn.preprocessing import StandardScaler
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
-
 print('Normalized training data:')
 print(X_train.shape, X_test.shape)
-
-#%% Apply PCA
-'''from sklearn.decomposition import PCA
-pca = PCA(n_components=2, random_state=42)  # Keep 95% of variance
-X_train = pca.fit_transform(X_train)
-X_test = pca.transform(X_test)
-
-print('PCA applied:')
-print(X_train.shape, X_test.shape)'''
 
 # %% ML algorithms (Revisit Lecture Notes 7-9)
 # Load libraries
@@ -105,12 +106,13 @@ from sklearn.svm import SVC
 kfold = model_selection.KFold(n_splits=10)
 scoring = 'accuracy'
 
-models = [('KNN', KNeighborsClassifier(n_neighbors=10, metric='euclidean')),
+models = [('KNN', KNeighborsClassifier(n_neighbors=5, metric='euclidean')),
          ('Decision Tree', DecisionTreeClassifier(max_depth=30, random_state=42)), 
-         ('Random Forest', RandomForestClassifier(n_estimators=100, max_depth=20, random_state=42)),
-         ('MLP', MLPClassifier(hidden_layer_sizes=(100, 20), max_iter=1000, 
-                               activation='relu', random_state=42)),
-        ('SVM', SVC(kernel='rbf', C=1, gamma='scale', random_state=42))]
+         ('Random Forest', RandomForestClassifier(n_estimators=100, max_depth=30, random_state=42))]
+
+# Archived: 
+# ('MLP', MLPClassifier(hidden_layer_sizes=(100, 20), max_iter=1000, activation='relu', random_state=42))
+# ('SVM', SVC(kernel='rbf', C=1, gamma='scale', random_state=42))
 
 results = []
 names = []
@@ -124,7 +126,7 @@ for name, model in models:
 choice = 1
 
 clf = models[choice][1] # first index indicates the model to use
-#clf = SVC(random_state=0)
+#clf = RandomForestClassifier(n_estimators=200, random_state=42)
 clf.fit(X_train, y_train)
 
 #%% Evaluate the model
@@ -151,4 +153,70 @@ plt.title('Confusion Matrix')
 plt.tight_layout()
 plt.show()
 
-# %% Bonus: 1D CNN
+#%% CHOSEN: DECISION TREE AND RANDOM FOREST
+
+#%% PREDICTION OF ONE SAMPLE:
+import pandas as pd
+filePath = 'Team_1_FourChannels'
+
+date = 20250502
+pattern = 'triangle'
+channels = '4'
+sampling = '5Hz'
+run = '1'
+steps = 100
+
+# p - print bed accelerometer; n - nozzle; s - sound sensor (Right, Left)
+df = pd.read_csv(filePath + f'/{date}_{pattern}_{sampling}_{channels}_{run}.csv', 
+                 names=['Time', 'Yp', 'Yn', 'SoundR', 'SoundL'])
+dfNew = df['Time'].str.split(',', expand=True)
+dfNew = dfNew.apply(pd.to_numeric, errors='coerce')
+
+i = 300 
+j = i+steps
+dfNew = dfNew[i:j]
+
+time = dfNew[0]  # time in seconds
+yP, yN = np.array(dfNew[1]), np.array(dfNew[2])
+sR, sL = np.array(dfNew[3]), np.array(dfNew[4])
+
+## Wavelet Domain
+import scipy.stats as stats
+import pywt
+
+sp = np.diff(time).mean()
+family = 'mexh'
+scales = np.arange(1, 500) # Perplexity: np.geomspace(1, 1024, num=75)
+
+printBedNew = pywt.cwt(yP, scales, family, sampling_period=sp)[0]
+nozzleNew = pywt.cwt(yN, scales, family, sampling_period=sp)[0]
+soundRightNew = pywt.cwt(sR, scales, family, sampling_period=sp)[0]
+soundLeftNew = pywt.cwt(sL, scales, family, sampling_period=sp)[0]
+
+printBedNew = printBedNew.reshape(len(printBedNew), -1) 
+nozzleNew = nozzleNew.reshape(len(nozzleNew), -1)
+soundRightNew = soundRightNew.reshape(len(soundRightNew), -1)
+soundLeftNew = soundLeftNew.reshape(len(soundLeftNew), -1)
+
+printBedFDF, nozzleFDF = [], []
+soundRightFDF, soundLeftFDF = [], []
+
+for i in printBedNew:
+    printBedFDF.append([np.max(i), np.sum(i), np.mean(i), np.var(i), 
+                        np.max(np.abs(i)), stats.skew(i), stats.kurtosis(i)])
+for j in nozzleNew:
+    nozzleFDF.append([np.max(j), np.sum(j), np.mean(j), np.var(j), 
+                      np.max(np.abs(j)), stats.skew(j), stats.kurtosis(j)])
+for k in soundRightNew:
+    soundRightFDF.append([np.max(k), np.sum(k), np.mean(k), np.var(k), 
+                          np.max(np.abs(k)), stats.skew(k), stats.kurtosis(k)])
+for l in soundLeftNew:
+    soundLeftFDF.append([np.max(l), np.sum(l), np.mean(l), np.var(l), 
+                         np.max(np.abs(l)), stats.skew(l), stats.kurtosis(l)])
+
+printBedFDF, nozzleFDF = np.array(printBedFDF), np.array(nozzleFDF)
+soundRightFDF, soundLeftFDF = np.array(soundRightFDF), np.array(soundLeftFDF)
+wdf = np.concatenate([printBedFDF, nozzleFDF, soundRightFDF, soundLeftFDF])
+
+print('Prediction:', np.mean(clf.predict(wdf)))
+# %%

@@ -88,13 +88,17 @@ printBedFDF, nozzleFDF = [], []
 soundRightFDF, soundLeftFDF = [], []
 
 for i in printBedNew:
-    printBedFDF.append([np.max(i), np.sum(i), np.mean(i), np.var(i), np.max(np.abs(i)), stats.skew(i), stats.kurtosis(i)])
+    printBedFDF.append([np.max(i), np.sum(i), np.mean(i), np.var(i), 
+                        np.max(np.abs(i)), stats.skew(i), stats.kurtosis(i)])
 for j in nozzleNew:
-    nozzleFDF.append([np.max(j), np.sum(j), np.mean(j), np.var(j), np.max(np.abs(j)), stats.skew(j), stats.kurtosis(j)])
+    nozzleFDF.append([np.max(j), np.sum(j), np.mean(j), np.var(j), 
+                      np.max(np.abs(j)), stats.skew(j), stats.kurtosis(j)])
 for k in soundRightNew:
-    soundRightFDF.append([np.max(k), np.sum(k), np.mean(k), np.var(k), np.max(np.abs(k)), stats.skew(k), stats.kurtosis(k)])
+    soundRightFDF.append([np.max(k), np.sum(k), np.mean(k), np.var(k), 
+                          np.max(np.abs(k)), stats.skew(k), stats.kurtosis(k)])
 for l in soundLeftNew:
-    soundLeftFDF.append([np.max(l), np.sum(l), np.mean(l), np.var(l), np.max(np.abs(l)), stats.skew(l), stats.kurtosis(l)])
+    soundLeftFDF.append([np.max(l), np.sum(l), np.mean(l), np.var(l), 
+                         np.max(np.abs(l)), stats.skew(l), stats.kurtosis(l)])
 
 printBedFDF, nozzleFDF = np.array(printBedFDF), np.array(nozzleFDF)
 soundRightFDF, soundLeftFDF = np.array(soundRightFDF), np.array(soundLeftFDF)
@@ -105,11 +109,11 @@ print('Sound Right:', soundRightFDF.shape)
 print('Sound Left:', soundLeftFDF.shape)
 
 #%% Combine data
-tdf = np.concatenate([printBedFDF, nozzleFDF, soundRightFDF, soundLeftFDF])
-print(tdf.shape)
+fdf = np.concatenate([printBedFDF, nozzleFDF, soundRightFDF, soundLeftFDF])
+print(fdf.shape)
 
 #%% Preprocessed features in the time domain
-np.save('4 Machine Learning' + f'/1 {date}_{pattern}_{sampling}_{channels}_{run}_FrequencyDomainFeatures_{steps}.npy', tdf)
+np.save('4 Machine Learning' + f'/1 {date}_{pattern}_{sampling}_{channels}_{run}_FrequencyDomainFeatures_{steps}.npy', fdf)
 
 # %% Visualize windows
 import matplotlib.pyplot as plt

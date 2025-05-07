@@ -100,7 +100,7 @@ plt.xlabel('Time (s)')
 plt.ylabel('Frequency (Hz)')
 plt.show()
 
-#%%
+#%% Original: Dr. Tian
 import scipy.stats as stats
 from scipy.fft import fft, fftfreq
 

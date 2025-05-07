@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 filePath = 'Team_1_FourChannels'
 
 date = 20250502
-pattern = 'concentric'
+pattern = 'triangle'
 channels = '4'
 sampling = '5Hz'
 run = '1'
@@ -55,7 +55,7 @@ print('Nozzle:', nozzle.shape)
 print('Sound Right:', soundRight.shape)
 print('Sound Left:', soundLeft.shape)
 
-# %% Restructure data (chunking each dimension from each channel)
+# %% Restructure data (chunking each dimension from each channel) # WHAT WE SHOULD RECEIVE PRIOR TO WAVELET CONV.
 if len(printBed) % steps != 0:
     removal = len(printBed) % steps
 
@@ -77,55 +77,51 @@ print('Nozzle:', nozzleNew.shape)
 print('Sound Right:', soundRightNew.shape)
 print('Sound Left:', soundLeftNew.shape)
 
-# %% Extract time domain features
-printBedTDF, nozzleTDF = [], []
-soundRightTDF, soundLeftTDF = [], []
-
+# %% Extract frequency domain features
 import scipy.stats as stats
 
+import pywt
+
+sp = np.diff(time).mean()
+family = 'mexh'
+scales = np.arange(1, 500) # Perplexity: np.geomspace(1, 1024, num=75)
+
+printBedNew, nozzleNew = pywt.cwt(printBedNew, scales, family, sampling_period=sp)[0], pywt.cwt(nozzleNew, scales, family, sampling_period=sp)[0]
+soundRightNew, soundLeftNew = pywt.cwt(soundRightNew, scales, family, sampling_period=sp)[0], pywt.cwt(soundLeftNew, scales, family, sampling_period=sp)[0]
+
+printBedNew, nozzleNew = printBedNew.reshape(len(printBedNew), -1), nozzleNew.reshape(len(nozzleNew), -1)
+soundRightNew, soundLeftNew = soundRightNew.reshape(len(soundRightNew), -1), soundLeftNew.reshape(len(soundLeftNew), -1)
+
+printBedFDF, nozzleFDF = [], []
+soundRightFDF, soundLeftFDF = [], []
+
 for i in printBedNew:
-    printBedTDF.append([
-        np.min(i), np.max(i), np.mean(i), np.sqrt(np.mean(i**2)), np.var(i),
-        np.std(i), np.mean(i**2), np.max(np.abs(i)), np.ptp(i),
-        np.max(np.abs(i))/np.sqrt(np.mean(i**2)), stats.skew(i), stats.kurtosis(i),
-        np.sqrt(np.mean(i**2))/np.mean(i), np.max(np.abs(i))/np.mean(i)
-        ])
+    printBedFDF.append([np.max(i), np.sum(i), np.mean(i), np.var(i), 
+                        np.max(np.abs(i)), stats.skew(i), stats.kurtosis(i)])
 for j in nozzleNew:
-    nozzleTDF.append([
-        np.min(j), np.max(j), np.mean(j), np.sqrt(np.mean(j**2)), np.var(j),
-        np.std(j), np.mean(j**2), np.max(np.abs(j)), np.ptp(j),
-        np.max(np.abs(j))/np.sqrt(np.mean(j**2)), stats.skew(j), stats.kurtosis(j),
-        np.sqrt(np.mean(j**2))/np.mean(j), np.max(np.abs(j))/np.mean(j)
-        ])
+    nozzleFDF.append([np.max(j), np.sum(j), np.mean(j), np.var(j), 
+                      np.max(np.abs(j)), stats.skew(j), stats.kurtosis(j)])
 for k in soundRightNew:
-    soundRightTDF.append([
-        np.min(k), np.max(k), np.mean(k), np.sqrt(np.mean(k**2)), np.var(k),
-        np.std(k), np.mean(k**2), np.max(np.abs(k)), np.ptp(k),
-        np.max(np.abs(k))/np.sqrt(np.mean(k**2)), stats.skew(k), stats.kurtosis(k),
-        np.sqrt(np.mean(k**2))/np.mean(k), np.max(np.abs(k))/np.mean(k)
-        ])
+    soundRightFDF.append([np.max(k), np.sum(k), np.mean(k), np.var(k), 
+                          np.max(np.abs(k)), stats.skew(k), stats.kurtosis(k)])
 for l in soundLeftNew:
-    soundLeftTDF.append([
-        np.min(l), np.max(l), np.mean(l), np.sqrt(np.mean(l**2)), np.var(l),
-        np.std(l), np.mean(l**2), np.max(np.abs(l)), np.ptp(l),
-        np.max(np.abs(l))/np.sqrt(np.mean(l**2)), stats.skew(l), stats.kurtosis(l),
-        np.sqrt(np.mean(l**2))/np.mean(l), np.max(np.abs(l))/np.mean(l)
-        ])
+    soundLeftFDF.append([np.max(l), np.sum(l), np.mean(l), np.var(l), 
+                         np.max(np.abs(l)), stats.skew(l), stats.kurtosis(l)])
 
-printBedTDF, nozzleTDF = np.array(printBedTDF), np.array(nozzleTDF)
-soundRightTDF, soundLeftTDF = np.array(soundRightTDF), np.array(soundLeftTDF)
+printBedFDF, nozzleFDF = np.array(printBedFDF), np.array(nozzleFDF)
+soundRightFDF, soundLeftFDF = np.array(soundRightFDF), np.array(soundLeftFDF)
 
-print('Print Bed:', printBedTDF.shape)
-print('Nozzle:', nozzleTDF.shape)
-print('Sound Right:', soundRightTDF.shape)
-print('Sound Left:', soundLeftTDF.shape)
+print('Print Bed:', printBedFDF.shape)
+print('Nozzle:', nozzleFDF.shape)
+print('Sound Right:', soundRightFDF.shape)
+print('Sound Left:', soundLeftFDF.shape)
 
 #%% Combine data
-tdf = np.concatenate([printBedTDF, nozzleTDF, soundRightTDF, soundLeftTDF])
-print(tdf.shape)
+wdf = np.concatenate([printBedFDF, nozzleFDF, soundRightFDF, soundLeftFDF])
+print(wdf.shape)
 
 #%% Preprocessed features in the time domain
-np.save('4 Machine Learning' + f'/0 {date}_{pattern}_{sampling}_{channels}_{run}_TimeDomainFeatures_{steps}.npy', tdf)
+np.save('4 Machine Learning' + f'/2 {date}_{pattern}_{sampling}_{channels}_{run}_WaveletFeatures_{steps}_{family}.npy', wdf)
 
 # %% Visualize windows
 import matplotlib.pyplot as plt
@@ -149,3 +145,5 @@ plt.legend()
 plt.figure(3)
 plt.plot(signal_3, label='Sound Left', color='blue')
 plt.legend()
+
+# %%
