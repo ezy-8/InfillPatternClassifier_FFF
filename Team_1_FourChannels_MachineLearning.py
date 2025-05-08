@@ -32,12 +32,12 @@ X3 = np.load('4 Machine Learning' + f'/1 {date}_{pattern[3]}_{sampling}_{channel
 X4 = np.load('4 Machine Learning' + f'/1 {date}_{pattern[4]}_{sampling}_{channels}_{run}_FrequencyDomainFeatures_{steps}.npy')
 
 ## Wavelet Domain
-family = 'mexh'
-X0 = np.load('4 Machine Learning' + f'/2 {date}_{pattern[0]}_{sampling}_{channels}_{run}_WaveletFeatures_{steps}_{family}.npy')
-X1 = np.load('4 Machine Learning' + f'/2 {date}_{pattern[1]}_{sampling}_{channels}_{run}_WaveletFeatures_{steps}_{family}.npy')
-X2 = np.load('4 Machine Learning' + f'/2 {date}_{pattern[2]}_{sampling}_{channels}_{run}_WaveletFeatures_{steps}_{family}.npy')
-X3 = np.load('4 Machine Learning' + f'/2 {date}_{pattern[3]}_{sampling}_{channels}_{run}_WaveletFeatures_{steps}_{family}.npy')
-X4 = np.load('4 Machine Learning' + f'/2 {date}_{pattern[4]}_{sampling}_{channels}_{run}_WaveletFeatures_{steps}_{family}.npy')
+#family = 'mexh'
+#X0 = np.load('4 Machine Learning' + f'/2 {date}_{pattern[0]}_{sampling}_{channels}_{run}_WaveletFeatures_{steps}_{family}.npy')
+#X1 = np.load('4 Machine Learning' + f'/2 {date}_{pattern[1]}_{sampling}_{channels}_{run}_WaveletFeatures_{steps}_{family}.npy')
+#X2 = np.load('4 Machine Learning' + f'/2 {date}_{pattern[2]}_{sampling}_{channels}_{run}_WaveletFeatures_{steps}_{family}.npy')
+#X3 = np.load('4 Machine Learning' + f'/2 {date}_{pattern[3]}_{sampling}_{channels}_{run}_WaveletFeatures_{steps}_{family}.npy')
+#X4 = np.load('4 Machine Learning' + f'/2 {date}_{pattern[4]}_{sampling}_{channels}_{run}_WaveletFeatures_{steps}_{family}.npy')
 
 print(X0.shape, X1.shape, X2.shape, X3.shape, X4.shape)
 
@@ -108,7 +108,8 @@ scoring = 'accuracy'
 
 models = [('KNN', KNeighborsClassifier(n_neighbors=5, metric='euclidean')),
          ('Decision Tree', DecisionTreeClassifier(max_depth=30, random_state=42)), 
-         ('Random Forest', RandomForestClassifier(n_estimators=100, max_depth=30, random_state=42))]
+         ('Random Forest', RandomForestClassifier(n_estimators=100, max_depth=30, random_state=42)),
+         ('MLP', MLPClassifier(hidden_layer_sizes=(100,50,50), activation='relu', max_iter=2000, random_state=42))]
 
 # Archived: 
 # ('MLP', MLPClassifier(hidden_layer_sizes=(100, 20), max_iter=1000, activation='relu', random_state=42))
@@ -123,10 +124,9 @@ for name, model in models:
     print(f"{name}: {cv_results.mean():.3f} (±{cv_results.std():.3f})")
 
 #%% Best model
-choice = 1
+choice = 3
 
 clf = models[choice][1] # first index indicates the model to use
-#clf = RandomForestClassifier(n_estimators=200, random_state=42)
 clf.fit(X_train, y_train)
 
 #%% Evaluate the model
