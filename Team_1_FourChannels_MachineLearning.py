@@ -107,9 +107,9 @@ kfold = model_selection.KFold(n_splits=10)
 scoring = 'accuracy'
 
 models = [('KNN', KNeighborsClassifier(n_neighbors=5, metric='euclidean')),
-         ('Decision Tree', DecisionTreeClassifier(max_depth=30, random_state=42)), 
-         ('Random Forest', RandomForestClassifier(n_estimators=100, max_depth=30, random_state=42)),
-         ('MLP', MLPClassifier(hidden_layer_sizes=(100,50,50), activation='relu', max_iter=2000, random_state=42))]
+         ('Decision Tree', DecisionTreeClassifier(max_depth=20, random_state=42)), 
+         ('Random Forest', RandomForestClassifier(n_estimators=50, max_depth=20, random_state=42)),
+         ('MLP', MLPClassifier(hidden_layer_sizes=(100,50,25), activation='relu', max_iter=2000, random_state=42))]
 
 # Archived: 
 # ('MLP', MLPClassifier(hidden_layer_sizes=(100, 20), max_iter=1000, activation='relu', random_state=42))
@@ -137,24 +137,22 @@ print(f'Training Accuracy: {round(clf.score(X_train, y_train) * 100, 2)}%') #
 print(f'Testing Accuracy: {round(clf.score(X_test, y_test) * 100, 2)}%') #
 
 print('')
-print('Classification Report:\n', classification_report(y_test, y_pred))
+print(f'Classification Report of Proposed {models[choice][0]} Classifier\n\n', classification_report(y_test, y_pred, target_names=['Concentric', 'Hilbert Curve', 'Honeycomb', 'Rectilinear', 'Triangle']))
 
 #%% Confusion Matrix
 from sklearn.metrics import ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 
 matrix = confusion_matrix(y_test, y_pred)
-disp = ConfusionMatrixDisplay(confusion_matrix=matrix, display_labels=pattern)
+disp = ConfusionMatrixDisplay(confusion_matrix=matrix, display_labels=['Concentric', 'Hilbert', 'Honeycomb', 'Rectilinear', 'Triangle'])
 
 # Plot with values and colorbar
 disp.plot(cmap='Blues', values_format='d')  # 'd' = integer formatting
-print('Confusion Matrix:')
-plt.title('Confusion Matrix')
+plt.title(f'Confusion Matrix of Proposed {models[choice][0]} Classifier')
 plt.tight_layout()
 plt.show()
 
-#%% CHOSEN: DECISION TREE AND RANDOM FOREST
-
+#-------------------------------------------------------------------------------------#
 #%% PREDICTION OF ONE SAMPLE:
 import pandas as pd
 filePath = 'Team_1_FourChannels'

@@ -137,3 +137,81 @@ plt.legend()
 plt.figure(3)
 plt.plot(signal_3, label='Sound Left', color='blue')
 plt.legend()
+
+#%% POSTER VISUALS
+fontSize = 15
+
+soundRight100 = soundRight[0:100]
+plt.figure(2000)
+plt.title('Right sound sensor for concentric pattern (100 steps)', fontsize=fontSize)
+plt.plot(soundRight100, color='r')
+plt.xlabel('Time Samples', fontsize=fontSize)
+plt.ylabel('Amplitude (volts)', fontsize=fontSize)
+plt.tick_params(axis='both', which='major', labelsize=fontSize)
+plt.tight_layout()
+
+#%%
+plt.figure(2025)
+plt.title('Right sound sensor for concentric pattern (FFT)', fontsize=fontSize)
+
+soundRight100FD = np.fft.fft(soundRight100)
+x = np.fft.fftfreq(len(soundRight100), 1/5)
+
+y = np.abs(soundRight100FD) / len(soundRight100)
+
+pos_mask = x >= 0
+fft_freqs = x[pos_mask]
+magnitude = y[pos_mask]
+
+plt.plot(x,y, color='r')
+plt.title('Fast Fourier Transform spectrum for the first 100 steps', fontsize=fontSize)
+plt.xlabel('Frequency (Hz)', fontsize=fontSize)
+plt.ylabel('Magnitude', fontsize=fontSize)
+plt.tick_params(axis='both', which='major', labelsize=fontSize)
+
+plt.xlim(0, 2)
+
+plt.tight_layout()
+
+# %%
+import numpy as np
+import matplotlib.pyplot as plt
+
+# 1. Create a sample time series signal
+fs = 500  # Sampling frequency (Hz)
+t = np.linspace(0, 1, fs, endpoint=False)  # 1 second of data
+freq1 = 5   # Frequency of first sine wave (Hz)
+freq2 = 50  # Frequency of second sine wave (Hz)
+signal = np.sin(2 * np.pi * freq1 * t) + 0.5 * np.sin(2 * np.pi * freq2 * t)
+
+# 2. Compute the FFT (frequency domain)
+fft_vals = np.fft.fft(signal)
+fft_freqs = np.fft.fftfreq(len(signal), 1/fs)
+magnitude = np.abs(fft_vals) / len(signal)  # Normalize
+
+# Only keep the positive frequencies (real signals are symmetric in FFT)
+pos_mask = fft_freqs >= 0
+fft_freqs = fft_freqs[pos_mask]
+magnitude = magnitude[pos_mask]
+
+# 3. Plot the results
+plt.figure(figsize=(12, 5))
+
+# Time domain plot
+plt.subplot(1, 2, 1)
+plt.plot(t, signal)
+plt.title('Time Domain Signal')
+plt.xlabel('Time [s]')
+plt.ylabel('Amplitude')
+
+# Frequency domain plot
+plt.subplot(1, 2, 2)
+plt.stem(fft_freqs, magnitude)
+plt.title('Frequency Domain (FFT Spectrum)')
+plt.xlabel('Frequency [Hz]')
+plt.ylabel('Magnitude')
+plt.xlim(0, 100)  # Show up to 100 Hz
+
+plt.tight_layout()
+plt.show()
+# %%
